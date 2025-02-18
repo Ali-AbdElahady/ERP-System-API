@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ERP_System.Core.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace ERP_System.Repository.Data
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
         }
+        DbSet<Employee> Employees { get; set; }
     }
 }
