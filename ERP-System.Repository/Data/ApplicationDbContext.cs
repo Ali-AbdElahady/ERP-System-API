@@ -13,6 +13,6 @@ namespace ERP_System.Repository.Data
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
         }
-        DbSet<Employee> Employees { get; set; }
+        public DbSet<Employee> Employees { get; set; }
     }
 }

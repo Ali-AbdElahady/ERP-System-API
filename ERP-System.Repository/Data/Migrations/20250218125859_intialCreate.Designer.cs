@@ -8,10 +8,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace ERP_System.Repository.Migrations
+namespace ERP_System.Repository.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250218120358_intialCreate")]
+    [Migration("20250218125859_intialCreate")]
     partial class intialCreate
     {
         /// <inheritdoc />

@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace ERP_System.Repository.Migrations
+namespace ERP_System.Repository.Data.Migrations
 {
     /// <inheritdoc />
     public partial class intialCreate : Migration
