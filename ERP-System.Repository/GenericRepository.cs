@@ -22,7 +22,7 @@ namespace ERP_System.Repository
             await dbContext.Set<T>().AddAsync(item);
         }
 
-        public void DeleteAsync(T item)
+        public void Delete(T item)
         {
              dbContext.Set<T>().Remove(item);
         }
@@ -37,9 +37,9 @@ namespace ERP_System.Repository
             return await dbContext.Set<T>().FindAsync(id);
         }
 
-        public Task UpdateAsync(T item)
+        public void Update(T item)
         {
-            throw new NotImplementedException();
+            dbContext.Set<T>().Update(item);
         }
     }
 }

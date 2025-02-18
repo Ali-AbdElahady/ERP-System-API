@@ -12,7 +12,7 @@ namespace ERP_System.Core.Repositories
         Task<IEnumerable<T>> GetAllAsync();
         Task<T> GetByIdAsync(int id);
         Task AddAsync(T item); 
-        Task UpdateAsync(T item);
-        void DeleteAsync(T item);
+        void Update(T item);
+        void Delete(T item);
     }
 }

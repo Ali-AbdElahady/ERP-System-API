@@ -59,14 +59,45 @@ namespace ERP_System_API.Controllers
 
         // PUT api/<Employee>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> UpdateEmployee(int id, [FromBody] EmployeeDTO value)
         {
+            if(value == null)
+            {
+                return BadRequest("Invalid employee data.");
+
+            }
+            var existingEmployee = await _unitOfWork.Repository<Employee>().GetByIdAsync(id);
+            if (existingEmployee == null)
+            {
+                return NotFound($"Employee with ID {id} not found.");
+            }
+            _mapper.Map(value, existingEmployee);
+            _unitOfWork.Repository<Employee>().Update(existingEmployee); 
+            await _unitOfWork.CompleteAsync(); // Save changes to the database
+            return Ok(new { message = "Employee updated successfully." });
+
         }
 
         // DELETE api/<Employee>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            if (id <= 0)
+            {
+                return BadRequest("Invalid employee ID.");
+            }
+
+            var employee = await _unitOfWork.Repository<Employee>().GetByIdAsync(id);
+
+            if (employee == null)
+            {
+                return NotFound($"Employee with ID {id} not found.");
+            }
+
+            _unitOfWork.Repository<Employee>().Delete(employee);
+            await _unitOfWork.CompleteAsync(); // Save changes to the database
+
+            return Ok(new { message = "Employee deleted successfully." });
         }
     }
 }

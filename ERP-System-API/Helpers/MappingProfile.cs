@@ -8,7 +8,7 @@ namespace ERP_System_API.Helpers
     {
         public MappingProfile()
         {
-            CreateMap<Employee, EmployeeDTO>().ReverseMap();
+            CreateMap<Employee, EmployeeDTO>().ForMember(dest=>dest.Id,opt=>opt.Ignore()).ReverseMap();
         }
     }
 }
