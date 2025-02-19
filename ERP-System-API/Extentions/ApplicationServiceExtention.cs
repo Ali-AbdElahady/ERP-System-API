@@ -12,6 +12,7 @@ namespace ERP_System_API.Extentions
         {
             services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
             services.AddScoped(typeof(IEmployeeService), typeof(EmployeeService));
+            services.AddScoped(typeof(IDepartmentService), typeof(DepartmentService));
             services.AddAutoMapper(typeof(MappingProfile));
             return services;
         }
