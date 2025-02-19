@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using ERP_System.Core.Entities;
-using ERP_System_API.DTO;
+using ERP_System.Service.DTO;
 
-namespace ERP_System_API.Helpers
+namespace ERP_System.Service.Helpers
 {
     public class MappingProfile : Profile
     {

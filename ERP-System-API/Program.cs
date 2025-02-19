@@ -1,6 +1,7 @@
 
 using ERP_System.Repository.Data;
 using ERP_System_API.Extentions;
+using ERP_System_API.Middlewares;
 using Microsoft.EntityFrameworkCore;
 
 namespace ERP_System_API
@@ -60,13 +61,13 @@ namespace ERP_System_API
 
             #endregion
 
+            app.UseMiddleware<ErrorHandlingMiddleware>();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
             app.UseHttpsRedirection();
 
             app.UseAuthorization();

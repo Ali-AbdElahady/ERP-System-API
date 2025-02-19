@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ERP_System_API.DTO
+namespace ERP_System.Service.DTO
 {
     public class EmployeeDTO
     {

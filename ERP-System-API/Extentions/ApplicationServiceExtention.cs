@@ -1,6 +1,8 @@
 ﻿using ERP_System.Core.Repositories;
 using ERP_System.Repository;
-using ERP_System_API.Helpers;
+using ERP_System.Service.Helpers;
+using ERP_System.Service.Implementaions;
+using ERP_System.Service.Interfaces;
 
 namespace ERP_System_API.Extentions
 {
@@ -9,8 +11,8 @@ namespace ERP_System_API.Extentions
         public static IServiceCollection AddAplicationServices(this IServiceCollection services) 
         {
             services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
+            services.AddScoped(typeof(IEmployeeService), typeof(EmployeeService));
             services.AddAutoMapper(typeof(MappingProfile));
-
             return services;
         }
     }

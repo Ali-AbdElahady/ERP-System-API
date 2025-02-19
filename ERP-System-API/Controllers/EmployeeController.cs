@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using ERP_System.Core.Entities;
 using ERP_System.Core.Repositories;
-using ERP_System_API.DTO;
+using ERP_System.Service.DTO;
+using ERP_System.Service.Errors;
+using ERP_System.Service.Implementaions;
+using ERP_System.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -12,68 +15,51 @@ namespace ERP_System_API.Controllers
     [ApiController]
     public class EmployeeController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IEmployeeService _employeeService;
 
         public IMapper _mapper { get; }
 
-        public EmployeeController(IUnitOfWork unitOfWork, IMapper mapper)
+        public EmployeeController(IEmployeeService employeeService, IMapper mapper)
         {
-            this._unitOfWork = unitOfWork;
+            _employeeService = employeeService;
             _mapper = mapper;
         }
         // GET: api/<Employee>
         [HttpGet]
         public async Task<ActionResult<Employee>> GetEmployees()
-        {   
-            return Ok(await _unitOfWork.Repository<Employee>().GetAllAsync());
+        {
+            var employees = await _employeeService.GetAllEmployeesAsync();
+            return Ok(employees);
         }
 
         // GET api/<Employee>/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetEmployeeById(int id)
         {
-            var employee = await _unitOfWork.Repository<Employee>().GetByIdAsync(id);
-
-            if (employee == null)
-            {
-                return NotFound();
-            }
-
-            var employeeDto = _mapper.Map<EmployeeDTO>(employee);
-            return Ok(employeeDto);
+            var employee = await _employeeService.GetEmployeeByIdAsync(id);
+            if (employee == null) return NotFound();
+            return Ok(employee);
         }
 
         // POST api/<Employee>
         [HttpPost]
-        public async Task<IActionResult> AddEmplyee([FromBody] EmployeeDTO value)
+        public async Task<IActionResult> AddEmployee([FromBody] EmployeeDTO value)
         {
             if (value == null)
             {
-                return BadRequest("Invalid employee data.");
+                return BadRequest(new ApiResponse(400, "there is a problem with your order"));
             }
-            var employee = _mapper.Map<Employee>(value);
-            await _unitOfWork.Repository<Employee>().AddAsync(employee);
-            await _unitOfWork.CompleteAsync();
-            return CreatedAtAction(nameof(GetEmployeeById), new { id = employee.Id }, value);
+            var employee = await _employeeService.CreateEmployeeAsync(value);
+            return CreatedAtAction(nameof(GetEmployeeById), new { id = employee.Id }, employee);
+
         }
 
         // PUT api/<Employee>/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateEmployee(int id, [FromBody] EmployeeDTO value)
         {
-            if(value == null)
-            {
-                return BadRequest("Invalid employee data.");
-
-            }
-            var existingEmployee = await _unitOfWork.Repository<Employee>().GetByIdAsync(id);
-            if (existingEmployee == null)
-            {
-                return NotFound($"Employee with ID {id} not found.");
-            }
-            _mapper.Map(value, existingEmployee);
-            _unitOfWork.Repository<Employee>().Update(existingEmployee); 
-            await _unitOfWork.CompleteAsync(); // Save changes to the database
+            var success = await _employeeService.UpdateEmployeeAsync(id, value);
+            if (!success) return NotFound();
             return Ok(new { message = "Employee updated successfully." });
 
         }
@@ -82,21 +68,8 @@ namespace ERP_System_API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            if (id <= 0)
-            {
-                return BadRequest("Invalid employee ID.");
-            }
-
-            var employee = await _unitOfWork.Repository<Employee>().GetByIdAsync(id);
-
-            if (employee == null)
-            {
-                return NotFound($"Employee with ID {id} not found.");
-            }
-
-            _unitOfWork.Repository<Employee>().Delete(employee);
-            await _unitOfWork.CompleteAsync(); // Save changes to the database
-
+            var success = await _employeeService.DeleteEmployeeAsync(id);
+            if (!success) return NotFound();
             return Ok(new { message = "Employee deleted successfully." });
         }
     }
