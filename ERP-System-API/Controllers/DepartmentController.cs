@@ -11,6 +11,7 @@ using AutoMapper;
 using ERP_System.Service.DTO;
 using ERP_System.Service.Errors;
 using ERP_System.Service.Interfaces;
+using ERP_System.Service.Helpers;
 
 namespace ERP_System_API.Controllers
 {
@@ -29,7 +30,7 @@ namespace ERP_System_API.Controllers
         }
         // GET: api/<Department>
         [HttpGet]
-        public async Task<ActionResult<Department>> GetDepatments()
+        public async Task<ActionResult<Pagination<DepartmentDto>>> GetDepatments()
         {
             var departments = await _departmentService.GetAllDepartmentsAsync();
             return Ok(departments);
@@ -46,11 +47,11 @@ namespace ERP_System_API.Controllers
 
         // POST api/<Department>
         [HttpPost]
-        public async Task<IActionResult> AddEmployee([FromBody] DepartmentDto value)
+        public async Task<IActionResult> AddDepartment([FromBody] DepartmentDto value)
         {
             if (value == null)
             {
-                return BadRequest(new ApiResponse(400, "there is a problem with your order"));
+                return BadRequest(new ApiResponse(400, "there is a problem with your Data"));
             }
             var department = await _departmentService.CreateDepartmentAsync(value);
             return CreatedAtAction(nameof(GetDepartmentById), new { id = department.DepartmentId }, department);
@@ -59,8 +60,12 @@ namespace ERP_System_API.Controllers
 
         // PUT api/<Department>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEmployee(int id, [FromBody] DepartmentDto value)
+        public async Task<IActionResult> UpdateDepartment(int id, [FromBody] DepartmentDto value)
         {
+            if (value == null || value.DepartmentId != id)
+            {
+                return BadRequest(new ApiResponse(400, "there is a problem with your Data"));
+            }
             var success = await _departmentService.UpdateDepartmentAsync(id, value);
             if (!success) return NotFound();
             return Ok(new { message = "Department updated successfully." });

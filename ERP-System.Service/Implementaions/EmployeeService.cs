@@ -3,6 +3,7 @@ using ERP_System.Core.Entities;
 using ERP_System.Core.Repositories;
 using ERP_System.Service.DTO;
 using ERP_System.Service.Errors;
+using ERP_System.Service.Helpers;
 using ERP_System.Service.Interfaces;
 
 namespace ERP_System.Service.Implementaions
@@ -17,9 +18,9 @@ namespace ERP_System.Service.Implementaions
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<EmployeeDTO> CreateEmployeeAsync(EmployeeDTO employeeDto)
+        public async Task<EmployeeDTO> CreateEmployeeAsync(CreateUpdateEmployeeDto createUpdateEmployeeDto)
         {
-            var employee = _mapper.Map<Employee>(employeeDto);
+            var employee = _mapper.Map<Employee>(createUpdateEmployeeDto);
             await _unitOfWork.Repository<Employee>().AddAsync(employee);
             await _unitOfWork.CompleteAsync();
             return _mapper.Map<EmployeeDTO>(employee);
@@ -36,10 +37,12 @@ namespace ERP_System.Service.Implementaions
             return true;
         }
 
-        public async Task<IEnumerable<EmployeeDTO>> GetAllEmployeesAsync()
+        public async Task<Pagination<EmployeeDTO>> GetAllEmployeesAsync()
         {
             var employees = await _unitOfWork.Repository<Employee>().GetAllAsync();
-            return _mapper.Map<IEnumerable<EmployeeDTO>>(employees);
+            var mapedEmployees = _mapper.Map<IReadOnlyList<EmployeeDTO>>(employees);
+            var pagedEmployees = new Pagination<EmployeeDTO>(5, 0, mapedEmployees, 5);
+            return pagedEmployees;
         }
 
         public async Task<EmployeeDTO> GetEmployeeByIdAsync(int id)
@@ -48,13 +51,12 @@ namespace ERP_System.Service.Implementaions
             return _mapper.Map<EmployeeDTO>(employee);
         }
 
-        public async Task<bool> UpdateEmployeeAsync(int id, EmployeeDTO employeeDto)
+        public async Task<bool> UpdateEmployeeAsync(int id, CreateUpdateEmployeeDto createUpdateEmployeeDto)
         {
-            if(id != employeeDto.Id) return false;
             var existingEmployee = await _unitOfWork.Repository<Employee>().GetByIdAsync(id);
             if (existingEmployee == null) return false;
 
-            _mapper.Map(employeeDto, existingEmployee);
+            _mapper.Map(createUpdateEmployeeDto, existingEmployee);
             _unitOfWork.Repository<Employee>().Update(existingEmployee);
             await _unitOfWork.CompleteAsync();
             return true;

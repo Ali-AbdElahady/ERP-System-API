@@ -27,7 +27,7 @@ namespace ERP_System.Repository
              dbContext.Set<T>().Remove(item);
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IReadOnlyList<T>> GetAllAsync()
         {
             return await dbContext.Set<T>().ToListAsync();
         }

@@ -26,6 +26,12 @@ namespace ERP_System.Repository.Data.Configurations
                 .WithMany(e => e.Subordinates)
                 .HasForeignKey(e => e.ManagerId)
                 .OnDelete(DeleteBehavior.Restrict); // Prevent deleting manager if employees exist.
+            builder
+            .Property(e => e.ManagerId)
+            .HasConversion(
+                v => v == 0 ? (int?)null : v,  // Convert 0 to NULL before saving
+                v => v ?? 0                   // Convert NULL to 0 when retrieving (optional)
+            );
         }
     }
 }

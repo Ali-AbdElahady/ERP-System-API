@@ -1,14 +1,15 @@
 ﻿using ERP_System.Core.Entities;
 using ERP_System.Service.DTO;
+using ERP_System.Service.Helpers;
 
 namespace ERP_System.Service.Interfaces
 {
     public interface IEmployeeService
     {
-        Task<IEnumerable<EmployeeDTO>> GetAllEmployeesAsync();
+        Task<Pagination<EmployeeDTO>> GetAllEmployeesAsync();
         Task<EmployeeDTO> GetEmployeeByIdAsync(int id);
-        Task<EmployeeDTO> CreateEmployeeAsync(EmployeeDTO employeeDto);
-        Task<bool> UpdateEmployeeAsync(int id, EmployeeDTO employeeDto);
+        Task<EmployeeDTO> CreateEmployeeAsync(CreateUpdateEmployeeDto employeeDto);
+        Task<bool> UpdateEmployeeAsync(int id, CreateUpdateEmployeeDto employeeDto);
         Task<bool> DeleteEmployeeAsync(int id);
     }
 }

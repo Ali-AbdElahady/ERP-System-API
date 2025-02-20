@@ -46,7 +46,7 @@ namespace ERP_System.Repository.Data.Migrations
 
                     b.HasIndex("ManagerId");
 
-                    b.ToTable("Departments");
+                    b.ToTable("Departments", (string)null);
                 });
 
             modelBuilder.Entity("ERP_System.Core.Entities.Employee", b =>
@@ -106,7 +106,7 @@ namespace ERP_System.Repository.Data.Migrations
 
                     b.HasIndex("ManagerId");
 
-                    b.ToTable("Employees");
+                    b.ToTable("Employees", (string)null);
                 });
 
             modelBuilder.Entity("ERP_System.Core.Entities.Department", b =>

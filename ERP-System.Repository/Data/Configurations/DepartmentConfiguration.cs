@@ -20,6 +20,12 @@ namespace ERP_System.Repository.Data.Configurations
                 .WithMany()
                 .HasForeignKey(d => d.ManagerId)
                 .OnDelete(DeleteBehavior.SetNull); // If manager is removed, set it as null.
+            builder
+            .Property(d => d.ManagerId)
+            .HasConversion(
+                v => v == 0 ? (int?)null : v,  // Convert 0 to NULL before saving
+                v => v ?? 0                   // Convert NULL to 0 when retrieving (optional)
+            );
         }
     }
 }

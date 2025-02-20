@@ -3,6 +3,7 @@ using ERP_System.Core.Entities;
 using ERP_System.Core.Repositories;
 using ERP_System.Repository;
 using ERP_System.Service.DTO;
+using ERP_System.Service.Helpers;
 using ERP_System.Service.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -21,9 +22,9 @@ namespace ERP_System.Service.Implementaions
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<DepartmentDto> CreateDepartmentAsync(DepartmentDto departmentDto)
+        public async Task<DepartmentDto> CreateDepartmentAsync(CreateUpdateDepartmentDto createUpdateDepartmentDto)
         {
-            var department = _mapper.Map<Department>(departmentDto);
+            var department = _mapper.Map<Department>(createUpdateDepartmentDto);
             await _unitOfWork.Repository<Department>().AddAsync(department);
             await _unitOfWork.CompleteAsync();
             return _mapper.Map<DepartmentDto>(department);
@@ -39,10 +40,12 @@ namespace ERP_System.Service.Implementaions
             return true;
         }
 
-        public async Task<IEnumerable<DepartmentDto>> GetAllDepartmentsAsync()
+        public async Task<Pagination<DepartmentDto>> GetAllDepartmentsAsync()
         {
-            var department = await _unitOfWork.Repository<Department>().GetAllAsync();
-            return _mapper.Map<IEnumerable<DepartmentDto>>(department);
+            var departments = await _unitOfWork.Repository<Department>().GetAllAsync();
+            var mappedDepartment = _mapper.Map<IReadOnlyList<DepartmentDto>>(departments);
+            var pagedDepartments = new Pagination<DepartmentDto>(5,0,mappedDepartment,5);
+             return pagedDepartments;
         }
 
         public async Task<DepartmentDto> GetDepartmentByIdAsync(int id)
@@ -51,13 +54,12 @@ namespace ERP_System.Service.Implementaions
             return _mapper.Map<DepartmentDto>(department);
         }
 
-        public async Task<bool> UpdateDepartmentAsync(int id, DepartmentDto departmentDto)
+        public async Task<bool> UpdateDepartmentAsync(int id, CreateUpdateDepartmentDto createUpdateDepartmentDto)
         {
-            if (id != departmentDto.DepartmentId) return false;
             var existingDepartment = await _unitOfWork.Repository<Department>().GetByIdAsync(id);
             if (existingDepartment == null) return false;
 
-            _mapper.Map(departmentDto, existingDepartment);
+            _mapper.Map(createUpdateDepartmentDto, existingDepartment);
             _unitOfWork.Repository<Department>().Update(existingDepartment);
             await _unitOfWork.CompleteAsync();
             return true;
