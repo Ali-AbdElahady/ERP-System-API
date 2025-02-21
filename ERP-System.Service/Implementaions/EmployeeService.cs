@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using ERP_System.Core.Entities;
 using ERP_System.Core.Repositories;
+using ERP_System.Core.Specification.EmployeeSpecs;
+using ERP_System.Core.Specifications.EmployeeSpec;
+using ERP_System.Repository;
 using ERP_System.Service.DTO;
 using ERP_System.Service.Errors;
 using ERP_System.Service.Helpers;
@@ -37,11 +40,17 @@ namespace ERP_System.Service.Implementaions
             return true;
         }
 
-        public async Task<Pagination<EmployeeDTO>> GetAllEmployeesAsync()
+        public async Task<Pagination<EmployeeDTO>> GetAllEmployeesAsync(EmployeeSpecParams _params)
         {
-            var employees = await _unitOfWork.Repository<Employee>().GetAllAsync();
+            var spec = new EmployeeSpecification(_params);
+            var employees = await _unitOfWork.Repository<Employee>().GetAllWithSpecAsync(spec);
+
+            var specForAll = new EmployeeFilterCount(_params);
+            var AllEmps = await _unitOfWork.Repository<Employee>().GetAllWithSpecAsync(specForAll);
+
             var mapedEmployees = _mapper.Map<IReadOnlyList<EmployeeDTO>>(employees);
-            var pagedEmployees = new Pagination<EmployeeDTO>(5, 0, mapedEmployees, 5);
+
+            var pagedEmployees = new Pagination<EmployeeDTO>(_params.PageSize,_params.pageNumber,mapedEmployees,AllEmps.Count);
             return pagedEmployees;
         }
 

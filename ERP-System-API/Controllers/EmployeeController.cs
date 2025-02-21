@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ERP_System.Core.Entities;
 using ERP_System.Core.Repositories;
+using ERP_System.Core.Specification.EmployeeSpecs;
 using ERP_System.Service.DTO;
 using ERP_System.Service.Errors;
 using ERP_System.Service.Helpers;
@@ -13,9 +14,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ERP_System_API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class EmployeeController : ControllerBase
+    public class EmployeeController : APIBaseController
     {
         private readonly IEmployeeService _employeeService;
 
@@ -28,9 +27,9 @@ namespace ERP_System_API.Controllers
         }
         // GET: api/<Employee>
         [HttpGet]
-        public async Task<ActionResult<Pagination<EmployeeDTO>>> GetEmployees()
+        public async Task<ActionResult<Pagination<EmployeeDTO>>> GetEmployees([FromQuery] EmployeeSpecParams _params)
         {
-            var employees = await _employeeService.GetAllEmployeesAsync();
+            var employees = await _employeeService.GetAllEmployeesAsync(_params);
             return Ok(employees);
         }
 
@@ -45,7 +44,7 @@ namespace ERP_System_API.Controllers
 
         // POST api/<Employee>
         [HttpPost]
-        public async Task<IActionResult> AddEmployee([FromBody] EmployeeDTO value)
+        public async Task<IActionResult> AddEmployee([FromBody] CreateUpdateEmployeeDto value)
         {
             if (value == null)
             {
@@ -58,9 +57,9 @@ namespace ERP_System_API.Controllers
 
         // PUT api/<Employee>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEmployee(int id, [FromBody] EmployeeDTO value)
+        public async Task<IActionResult> UpdateEmployee(int id, [FromBody] CreateUpdateEmployeeDto value)
         {
-            if (value == null || value.Id != id)
+            if (value == null)
             {
                 return BadRequest(new ApiResponse(400, "there is a problem with your Data"));
             }

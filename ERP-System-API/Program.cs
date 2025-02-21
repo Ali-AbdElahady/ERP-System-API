@@ -1,7 +1,10 @@
 
+using ERP_System.Core.Entities;
 using ERP_System.Repository.Data;
+using ERP_System.Repository.Identity;
 using ERP_System_API.Extentions;
 using ERP_System_API.Middlewares;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace ERP_System_API
@@ -23,9 +26,22 @@ namespace ERP_System_API
             {
                 Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
-
+            builder.Services.AddDbContext<AppIdentityDbContext>(Options =>
+            {
+                Options.UseSqlServer(builder.Configuration.GetConnectionString("IdenityConnection"));
+            });
+            builder.Services.AddCors(Options =>
+            {
+                Options.AddPolicy("MyPolicy", options =>
+                {
+                    options.AllowAnyHeader();
+                    options.AllowAnyMethod();
+                    options.WithOrigins(builder.Configuration["FrontBaseUrl"]);
+                });
+            });
 
             builder.Services.AddAplicationServices();
+            builder.Services.AddIdentityServices(builder.Configuration);
 
             var app = builder.Build();
 
@@ -44,12 +60,12 @@ namespace ERP_System_API
                 await dbContext.Database.MigrateAsync();
 
                 // Ask CLR For Creating Object From AppIdentityDbContext Explicitly
-                //var IdentityDbContext = Services.GetRequiredService<AppIdentityDbContext>();
-                //await IdentityDbContext.Database.MigrateAsync();
+                var IdentityDbContext = Services.GetRequiredService<AppIdentityDbContext>();
+                await IdentityDbContext.Database.MigrateAsync();
 
-                // Ask CLR For Creating Object From UserManager<AppUser> Explicitly to Seed data
-                //var UserManagerDbContext = Services.GetRequiredService<UserManager<AppUser>>();
-                //await AppIdentityDbContextSeed.SeedUserAsync(UserManagerDbContext);
+                // Ask CLR For Creating Object From UserManager<ApplicationUser> Explicitly to Seed data
+                var UserManagerDbContext = Services.GetRequiredService<UserManager<ApplicationUser>>();
+                await AppIdentityDbContextSeed.SeedUserAsync(UserManagerDbContext);
 
                 //await StoreContextSeed.SeedAsync(dbContext);
             }
@@ -68,8 +84,11 @@ namespace ERP_System_API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            app.UseHttpsRedirection();
+            app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
+            app.UseCors("MyPolicy");
+            app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

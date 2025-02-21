@@ -1,4 +1,5 @@
 ﻿using ERP_System.Core.Entities;
+using ERP_System.Core.Specifications;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,8 @@ namespace ERP_System.Core.Repositories
         Task AddAsync(T item); 
         void Update(T item);
         void Delete(T item);
+        Task<T> GetByIdWithSpecAsync(ISpecification<T> spec);
+        Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T> spec);
+        Task<int> GetCountWithSpecAsync(ISpecification<T> spec);
     }
 }

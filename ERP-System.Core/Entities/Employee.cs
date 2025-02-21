@@ -31,6 +31,9 @@ namespace ERP_System.Core.Entities
         [ForeignKey("DepartmentId")]
         public int DepartmentId { get; set; }
         public virtual Department Department { get; set; }
+        [ForeignKey("ApplicationUserId")]
+        public string ApplicationUserId { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
         public int? ManagerId { get; set; } // Nullable because not every employee has a manager
         [ForeignKey("ManagerId")]
         public virtual Employee Manager { get; set; }  // Self-referencing FK

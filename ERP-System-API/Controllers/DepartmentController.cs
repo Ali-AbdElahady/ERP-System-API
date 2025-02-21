@@ -15,9 +15,7 @@ using ERP_System.Service.Helpers;
 
 namespace ERP_System_API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class DepartmentController : ControllerBase
+    public class DepartmentController : APIBaseController
     {
         private readonly IDepartmentService _departmentService;
 
@@ -47,7 +45,7 @@ namespace ERP_System_API.Controllers
 
         // POST api/<Department>
         [HttpPost]
-        public async Task<IActionResult> AddDepartment([FromBody] DepartmentDto value)
+        public async Task<IActionResult> AddDepartment([FromBody] CreateUpdateDepartmentDto value)
         {
             if (value == null)
             {
@@ -60,9 +58,9 @@ namespace ERP_System_API.Controllers
 
         // PUT api/<Department>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateDepartment(int id, [FromBody] DepartmentDto value)
+        public async Task<IActionResult> UpdateDepartment(int id, [FromBody] CreateUpdateDepartmentDto value)
         {
-            if (value == null || value.DepartmentId != id)
+            if (value == null)
             {
                 return BadRequest(new ApiResponse(400, "there is a problem with your Data"));
             }
