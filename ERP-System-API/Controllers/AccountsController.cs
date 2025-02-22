@@ -83,35 +83,6 @@ namespace ERP_System_API.Controllers
 
 		}
 
-		//[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-		//[HttpGet("Address")]
-		//public async Task<ActionResult<Address>> GetCurrentUserAddress()
-		//{
-		//	//var Email = User.FindFirstValue(ClaimTypes.Email);
-		//	//var user = userManager.FindByEmailAsync(Email);
-		//	// Because of User have navigational property the privious way will not work
-		//	// Then we will use the Extension method on userManager
-		//	var user = await userManager.FindUserWithAddressAsync(User);
-		//	var MappedAddress = mapper.Map<Address,AddressDto>(user.Address);
-		//	return Ok(MappedAddress);
-		//}
-
-		//[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-		//[HttpPut("Address")]
-		//public async Task<ActionResult<AddressDto>> UpdateAddress(AddressDto UpdatedAddress)
-		//{
-		//	var user = await userManager.FindUserWithAddressAsync(User);
-		//	if(user is null) return Unauthorized(new ApiResponse(401));
-		//	var address = mapper.Map<AddressDto, Address>(UpdatedAddress);
-		//	// beacuse of it create a new object with new id then it will remove the old address and add anthor one
-		//	// so we create equal the old Id with The new Id
-		//	address.Id = user.Address.Id;
-		//	user.Address = address;
-		//	var result = await userManager.UpdateAsync(user);
-		//	if (!result.Succeeded) return BadRequest(new ApiResponse(401));
-		//	return Ok(UpdatedAddress);
-		//}
-
 		[HttpGet("eamilExists")]
 		public async Task<ActionResult<bool>> CheckEmailExists(string email)
 		{
@@ -150,5 +121,34 @@ namespace ERP_System_API.Controllers
                 Tokken = await _tokenServices.CreateTokenAsync(user, _userManager)
             };
         }
+
+        // Request Password Reset (Generate Token)
+        [HttpPost("ForgotPassword")]
+        public async Task<ActionResult> ForgotPassword(ForgotPasswordDto model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user is null) return BadRequest(new ApiResponse(400, "User not found"));
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            // TODO: Send email with reset token (Implement Email Service)
+            // Example: _emailService.SendResetLink(user.Email, token);
+
+            return Ok(new { Message = "Password reset link has been sent to your email." });
+        }
+
+        // Reset Password
+        [HttpPost("ResetPassword")]
+        public async Task<ActionResult> ResetPassword(ResetPasswordDto model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user is null) return BadRequest(new ApiResponse(400, "Invalid email"));
+
+            var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
+            if (!result.Succeeded) return BadRequest(new ApiResponse(400, "Invalid token or password reset failed"));
+
+            return Ok(new { Message = "Password has been reset successfully." });
+        }
+
     }
 }
