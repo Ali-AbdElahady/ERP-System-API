@@ -12,39 +12,39 @@ namespace ERP_System.Repository
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        private readonly ApplicationDbContext dbContext;
+        private readonly ApplicationDbContext _dbContext;
 
         public GenericRepository(ApplicationDbContext dbContext)
         {
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }
         public async Task AddAsync(T item)
         {
-            await dbContext.Set<T>().AddAsync(item);
+            await _dbContext.Set<T>().AddAsync(item);
         }
 
         public void Delete(T item)
         {
-             dbContext.Set<T>().Remove(item);
+             _dbContext.Set<T>().Remove(item);
         }
 
         public async Task<IReadOnlyList<T>> GetAllAsync()
         {
-            return await dbContext.Set<T>().ToListAsync();
+            return await _dbContext.Set<T>().ToListAsync();
         }
 
         public async Task<T> GetByIdAsync(int id)
         {
-            return await dbContext.Set<T>().FindAsync(id);
+            return await _dbContext.Set<T>().FindAsync(id);
         }
 
         public void Update(T item)
         {
-            dbContext.Set<T>().Update(item);
+            _dbContext.Set<T>().Update(item);
         }
         public async Task<T> GetByIdWithSpecAsync(ISpecification<T> spec)
         {
-            return await SpecificationEvalutor<T>.GetQuery(dbContext.Set<T>(), spec).FirstOrDefaultAsync();
+            return await SpecificationEvalutor<T>.GetQuery(_dbContext.Set<T>(), spec).FirstOrDefaultAsync();
         }
 
         public async Task<int> GetCountWithSpecAsync(ISpecification<T> spec)
@@ -54,12 +54,12 @@ namespace ERP_System.Repository
 
         public async Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T> spec)
         {
-            var data = await SpecificationEvalutor<T>.GetQuery(dbContext.Set<T>(), spec).ToListAsync();
+            var data = await SpecificationEvalutor<T>.GetQuery(_dbContext.Set<T>(), spec).ToListAsync();
             return data;
         }
         private IQueryable<T> ApplySpecification(ISpecification<T> spec)
         {
-            return SpecificationEvalutor<T>.GetQuery(dbContext.Set<T>(), spec);
+            return SpecificationEvalutor<T>.GetQuery(_dbContext.Set<T>(), spec);
         }
     }
 }

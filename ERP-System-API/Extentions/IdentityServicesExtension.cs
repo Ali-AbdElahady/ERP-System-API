@@ -14,6 +14,7 @@ namespace ERP_System_API.Extentions
         public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration configuration) 
         {
             services.AddScoped<ITokenServices, TokenServices>();
+            services.AddScoped<IUserSeed, UsersSeed>();
             services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppIdentityDbContext>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {

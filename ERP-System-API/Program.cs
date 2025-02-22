@@ -2,6 +2,7 @@
 using ERP_System.Core.Entities;
 using ERP_System.Repository.Data;
 using ERP_System.Repository.Identity;
+using ERP_System.Service.AuthServices;
 using ERP_System_API.Extentions;
 using ERP_System_API.Middlewares;
 using Microsoft.AspNetCore.Identity;
@@ -64,10 +65,10 @@ namespace ERP_System_API
                 await IdentityDbContext.Database.MigrateAsync();
 
                 // Ask CLR For Creating Object From UserManager<ApplicationUser> Explicitly to Seed data
-                var UserManagerDbContext = Services.GetRequiredService<UserManager<ApplicationUser>>();
-                await AppIdentityDbContextSeed.SeedUserAsync(UserManagerDbContext);
-
+                //var UserManagerDbContext = Services.GetRequiredService<UserManager<ApplicationUser>>();
                 //await StoreContextSeed.SeedAsync(dbContext);
+                var dbInitial = Services.GetRequiredService<IUserSeed>();
+                await dbInitial.Initialize();
             }
             catch (Exception ex)
             {

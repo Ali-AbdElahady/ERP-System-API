@@ -11,11 +11,11 @@ namespace ERP_System.Service.AuthServices
 {
 	public class TokenServices : ITokenServices
 	{
-		private readonly IConfiguration configuration;
+		private readonly IConfiguration _configuration;
 
 		public TokenServices(IConfiguration configuration)
         {
-			this.configuration = configuration;
+			_configuration = configuration;
 		}
         public async Task<string> CreateTokenAsync(ApplicationUser user, UserManager<ApplicationUser> userManager)
 		{
@@ -36,13 +36,13 @@ namespace ERP_System.Service.AuthServices
 				AuthClaims.Add(new Claim(ClaimTypes.Role, Role));
             }
 
-			var AuthKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Key"]));
+			var AuthKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"]));
 
 
 			var Token = new JwtSecurityToken(
-				issuer: configuration["JWT:ValidIssuer"], 
-				audience: configuration["JWT:ValidAudience"],
-				expires: DateTime.Now.AddDays(double.Parse(configuration["JWT:DurationInDays"])),
+				issuer: _configuration["JWT:ValidIssuer"], 
+				audience: _configuration["JWT:ValidAudience"],
+				expires: DateTime.Now.AddDays(double.Parse(_configuration["JWT:DurationInDays"])),
 				claims:AuthClaims,
 				signingCredentials: new SigningCredentials(AuthKey, SecurityAlgorithms.HmacSha256Signature)
 				); 
