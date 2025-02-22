@@ -1,5 +1,6 @@
 ﻿using ERP_System.Core.Repositories;
 using ERP_System.Repository;
+using ERP_System.Service.EmailServices;
 using ERP_System.Service.Helpers;
 using ERP_System.Service.Implementaions;
 using ERP_System.Service.Interfaces;

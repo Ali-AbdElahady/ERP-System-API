@@ -2,6 +2,8 @@
 using ERP_System.Core.Entities;
 using ERP_System.Repository.Identity;
 using ERP_System.Service.AuthServices;
+using ERP_System.Service.EmailServices;
+using ERP_System.Service.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -13,6 +15,11 @@ namespace ERP_System_API.Extentions
     {
         public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration configuration) 
         {
+            #region Allow email service Dependency Injection
+            services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
+            services.AddTransient<IEmailService, EmailService>();
+            #endregion
+
             services.AddScoped<ITokenServices, TokenServices>();
             services.AddScoped<IUserSeed, UsersSeed>();
             services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppIdentityDbContext>();
