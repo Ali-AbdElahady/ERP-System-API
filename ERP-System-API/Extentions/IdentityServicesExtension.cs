@@ -22,7 +22,7 @@ namespace ERP_System_API.Extentions
 
             services.AddScoped<ITokenServices, TokenServices>();
             services.AddScoped<IUserSeed, UsersSeed>();
-            services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppIdentityDbContext>();
+            services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppIdentityDbContext>().AddDefaultTokenProviders();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters()

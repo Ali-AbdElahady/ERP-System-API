@@ -2,6 +2,7 @@
 using ERP_System.Core.AuthServices.Services;
 using ERP_System.Core.Entities;
 using ERP_System.Service.DTO.AuthDtos;
+using ERP_System.Service.EmailServices;
 using ERP_System.Service.Errors;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -16,14 +17,20 @@ namespace ERP_System_API.Controllers
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly SignInManager<ApplicationUser> _signInManager;
 		private readonly ITokenServices _tokenServices;
-		private readonly IMapper _mapper;
+        private readonly IEmailService _emailService;
+        private readonly IMapper _mapper;
 
-		public AccountsController(UserManager<ApplicationUser> userManager,SignInManager<ApplicationUser> signInManager , ITokenServices tokenServices, IMapper mapper)
+		public AccountsController(UserManager<ApplicationUser> userManager,
+			SignInManager<ApplicationUser> signInManager ,
+			ITokenServices tokenServices,
+			IEmailService emailService,
+			IMapper mapper)
         {
 			_userManager = userManager;
 			_signInManager = signInManager;
 			_tokenServices = tokenServices;
-			_mapper = mapper;
+            _emailService = emailService;
+            _mapper = mapper;
 		}
         // Register
         [HttpPost("Register")]
@@ -131,10 +138,9 @@ namespace ERP_System_API.Controllers
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            // TODO: Send email with reset token (Implement Email Service)
-            // Example: _emailService.SendResetLink(user.Email, token);
+            await _emailService.SendResetLinkAsync(user.Email, token);
 
-            return Ok(new { Message = "Password reset link has been sent to your email." });
+			return Ok(new { Message = "Password reset link has been sent to your email." });
         }
 
         // Reset Password
