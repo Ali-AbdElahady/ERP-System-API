@@ -41,6 +41,7 @@ namespace ERP_System_API
                 });
             });
 
+            builder.Services.AddSwaggerWithJwtAuthentication();
             builder.Services.AddAplicationServices();
             builder.Services.AddIdentityServices(builder.Configuration);
 

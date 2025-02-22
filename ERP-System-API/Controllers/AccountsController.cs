@@ -117,5 +117,38 @@ namespace ERP_System_API.Controllers
 		{
 			return await _userManager.FindByEmailAsync(email) is not null;
 		}
-	}
+
+        // Update User Profile
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPut("UpdateUser")]
+        public async Task<ActionResult<UserDto>> UpdateUser(UpdateUserDto model)
+        {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            if (email == null) return Unauthorized(new ApiResponse(401, "Unauthorized"));
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user is null) return NotFound(new ApiResponse(404, "User not found"));
+
+            // Check if email is being changed and already exists
+            if (model.Email != user.Email && await _userManager.FindByEmailAsync(model.Email)  is not null)
+            {
+                return BadRequest(new ApiResponse(400, "This email is already in use."));
+            }
+
+            user.DisplayName = model.DisplayName;
+            user.PhoneNumber = model.PhoneNumber;
+            user.Email = model.Email;
+            user.UserName = model.Email.Split('@')[0]; // Keep username aligned with email
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded) return BadRequest(new ApiResponse(400, "Error updating user"));
+
+            return new UserDto()
+            {
+                DisplayName = user.DisplayName,
+                Email = user.Email,
+                Tokken = await _tokenServices.CreateTokenAsync(user, _userManager)
+            };
+        }
+    }
 }
