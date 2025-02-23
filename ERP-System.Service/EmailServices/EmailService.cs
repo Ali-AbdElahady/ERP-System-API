@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MailKit.Net.Smtp;
+using MailKit.Security;
 
 namespace ERP_System.Service.EmailServices
 {
@@ -25,14 +26,37 @@ namespace ERP_System.Service.EmailServices
 
             message.Body = new TextPart("html")
             {
-                Text = $"<p>Click <a href='{resetLink}'>here</a> to reset your password.</p>"
+                Text = $"<p>Click <a href='{resetLink}'>here</a> to reset your password. the token is {token}</p>"
             };
 
-            using var client = new SmtpClient();
-            await client.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.Port, _emailSettings.UseSsl);
-            await client.AuthenticateAsync(_emailSettings.SenderEmail, _emailSettings.Password);
-            await client.SendAsync(message);
-            await client.DisconnectAsync(true);
+            try 
+            {
+                #region old
+                    //using var client = new SmtpClient();
+                    //await client.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.Port, _emailSettings.UseSsl);
+                    //await client.AuthenticateAsync(_emailSettings.SenderEmail, _emailSettings.Password);
+                    //await client.SendAsync(message);
+                    //await client.DisconnectAsync(true);
+                #endregion
+
+                #region new
+                    using var client = new SmtpClient();
+
+                    client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+
+                    await client.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
+                    
+                    await client.AuthenticateAsync("ali.test.202100@gmail.com", "lusu hzde rvpm moty");
+
+                    await client.SendAsync(message);
+                    await client.DisconnectAsync(true);
+
+                #endregion
+            }
+            catch (Exception ex) 
+            {
+
+            }
         }
     }
 }
