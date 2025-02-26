@@ -46,6 +46,7 @@ namespace ERP_System_API.Controllers
 				UserName = model.Email.Split('@')[0],
 				PhoneNumber = model.PhoneNumber
 			};
+
 			var Result = await _userManager.CreateAsync(user,model.Password);
 			if (!Result.Succeeded) return BadRequest(new ApiResponse(400));
 			return new UserDto()
@@ -64,6 +65,8 @@ namespace ERP_System_API.Controllers
 			if (user is null) return Unauthorized(new ApiResponse(401));
 			var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password,false);
 			if(!result.Succeeded) return Unauthorized(new ApiResponse(401));
+
+
 			return Ok(new UserDto()
 			{
 				DisplayName = user.DisplayName,
@@ -71,9 +74,27 @@ namespace ERP_System_API.Controllers
 				Tokken = await _tokenServices.CreateTokenAsync(user,_userManager)
 			});
 		}
+        // Login-2fa
+        [HttpPost("login-2fa")]
+        public async Task<IActionResult> LoginWith2FA(string email, string password, string token)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return Unauthorized();
 
-		// Get Current User
-		[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+            var signInResult = await _signInManager.PasswordSignInAsync(user, password, false, true);
+            if (!signInResult.Succeeded) return Unauthorized();
+
+            if (user.TwoFactorEnabled)
+            {
+                var valid = await _userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultAuthenticatorProvider, token);
+                if (!valid) return Unauthorized(new { message = "Invalid 2FA code." });
+            }
+
+            return Ok(new { message = "Login successful!" });
+        }
+
+        // Get Current User
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 		[HttpGet("GetCurrentUser")]
 		public async Task<ActionResult<UserDto>> GetCurrentUser()
 		{

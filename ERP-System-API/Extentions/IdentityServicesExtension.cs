@@ -20,9 +20,23 @@ namespace ERP_System_API.Extentions
             services.AddTransient<IEmailService, EmailService>();
             #endregion
 
-            services.AddScoped<ITokenServices, TokenServices>();
+
+            // Allow Dependency injection for Seeding Admin
             services.AddScoped<IUserSeed, UsersSeed>();
-            services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppIdentityDbContext>().AddDefaultTokenProviders();
+
+            // Add Identity Configurations
+            services.AddIdentity<ApplicationUser, IdentityRole>(
+                    // for Two-Factor Authentication - 2FA
+                    options =>
+                    {
+                        //options.SignIn.RequireConfirmedEmail = true; // يفضل تأكيد البريد قبل 2FA
+                        //options.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
+                    }
+                ).AddEntityFrameworkStores<AppIdentityDbContext>().AddDefaultTokenProviders();
+
+
+            // Allow Dependency injection for TokenServices to create token with jwt
+            services.AddScoped<ITokenServices, TokenServices>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters()

@@ -12,6 +12,7 @@ using ERP_System.Service.DTO;
 using ERP_System.Service.Errors;
 using ERP_System.Service.Interfaces;
 using ERP_System.Service.Helpers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ERP_System_API.Controllers
 {
