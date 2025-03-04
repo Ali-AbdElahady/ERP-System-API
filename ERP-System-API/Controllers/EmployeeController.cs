@@ -7,11 +7,10 @@ using ERP_System.Service.Errors;
 using ERP_System.Service.Helpers;
 using ERP_System.Service.Implementaions;
 using ERP_System.Service.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace ERP_System_API.Controllers
 {
@@ -27,6 +26,7 @@ namespace ERP_System_API.Controllers
             _mapper = mapper;
         }
         // GET: api/<Employee>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet]
         public async Task<ActionResult<Pagination<EmployeeDTO>>> GetEmployees([FromQuery] EmployeeSpecParams _params)
         {

@@ -29,8 +29,8 @@ namespace ERP_System_API.Extentions
                     // for Two-Factor Authentication - 2FA
                     options =>
                     {
-                        //options.SignIn.RequireConfirmedEmail = true; // يفضل تأكيد البريد قبل 2FA
-                        //options.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
+                        options.SignIn.RequireConfirmedEmail = true; // يفضل تأكيد البريد قبل 2FA
+                        options.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
                     }
                 ).AddEntityFrameworkStores<AppIdentityDbContext>().AddDefaultTokenProviders();
 

@@ -1,7 +1,10 @@
 ﻿using ERP_System.Core.Entities;
+using ERP_System.Service.Errors;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ERP_System_API.Controllers
 {
@@ -16,13 +19,14 @@ namespace ERP_System_API.Controllers
             _userManager = userManager;
             _signInManager = signInManager;
         }
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("enable")]
         public async Task<IActionResult> EnableTwoFactor()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Unauthorized();
+            var Email = User.FindFirstValue(ClaimTypes.Email);
+            if (Email == null) return Unauthorized(new ApiResponse(401, "Unauthorized"));
 
+            var user = await _userManager.FindByEmailAsync(Email);
             user.TwoFactorEnabled = true;
             await _userManager.UpdateAsync(user);
 
@@ -41,10 +45,14 @@ namespace ERP_System_API.Controllers
             return Ok(new { message = "Two-Factor Authentication disabled." });
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("generate-authenticator-key")]
         public async Task<IActionResult> GenerateAuthenticatorKey()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var Email = User.FindFirstValue(ClaimTypes.Email);
+            if (Email == null) return Unauthorized(new ApiResponse(401, "Unauthorized"));
+
+            var user = await _userManager.FindByEmailAsync(Email);
             if (user == null) return Unauthorized();
 
             var key = await _userManager.GetAuthenticatorKeyAsync(user);
